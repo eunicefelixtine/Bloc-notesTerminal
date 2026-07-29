@@ -12,19 +12,24 @@
     .icon-sm { width: 14px; height: 14px; }
 
     /* Barre d'outils supérieure */
-    header { background: #2c3e50; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-    .header-tools { display: flex; gap: 10px; align-items: center; }
-    .search-box, .sort-select { padding: 6px 12px; border-radius: 4px; border: none; font-size: 14px; }
-    .search-box { width: 180px; }
-    .sort-select { background: #ffffff; color: #2c3e50; cursor: pointer; }
-    .btn-new { background: #27ae60; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 6px; }
+    header { background: #2c3e50; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .btn-new { background: #27ae60; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; font-size: 14px; transition: background 0.2s; }
     .btn-new:hover { background: #219653; }
 
     /* Disposition principale */
     main { display: flex; flex: 1; overflow: hidden; }
 
     /* Sidebar liste des fichiers */
-    .sidebar { width: 320px; background: #ffffff; border-right: 1px solid #e0e0e0; overflow-y: auto; }
+    .sidebar { width: 320px; background: #ffffff; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; }
+    
+    /* En-tête de la Sidebar avec Recherche & Tri */
+    .sidebar-header { padding: 12px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0; display: flex; flex-direction: column; gap: 8px; }
+    .search-box { width: 100%; padding: 8px 12px; border-radius: 4px; border: 1px solid #dcdfe6; font-size: 13px; outline: none; transition: border-color 0.2s; }
+    .search-box:focus { border-color: #409eff; }
+    .sort-select { width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid #dcdfe6; background: #ffffff; color: #2c3e50; font-size: 12px; cursor: pointer; outline: none; }
+
+    .doc-list-container { flex: 1; overflow-y: auto; }
+
     .doc-item { padding: 12px 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
     .doc-item:hover { background: #f8f9fa; }
     .doc-item.active { background: #e8f0fe; border-left: 4px solid #1a73e8; }
@@ -54,9 +59,11 @@
     .doc-timestamp { font-size: 12px; color: #7f8c8d; font-style: italic; }
     
     /* Barre d'outils Copie et Exportation */
-    .editor-toolbar { display: flex; gap: 8px; }
+    .editor-toolbar { display: flex; gap: 8px; flex-wrap: wrap; }
     .btn-tool { background: #f8f9fa; border: 1px solid #dcdfe6; color: #606266; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
     .btn-tool:hover { background: #ecf5ff; color: #409eff; border-color: #c6e2ff; }
+    .btn-pdf { color: #e74c3c; border-color: #fadbd8; }
+    .btn-pdf:hover { background: #fef2f2; color: #c0392b; border-color: #f5c6cb; }
 
     .doc-textarea { flex: 1; border: 1px solid #f0f0f0; border-radius: 6px; padding: 15px; outline: none; font-size: 16px; line-height: 1.6; resize: none; font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; color: #2c3e50; margin-bottom: 15px; }
     .doc-textarea:focus { border-color: #409eff; }
@@ -81,6 +88,8 @@
     .btn-danger { flex: 1; padding: 8px; border: none; background: #e74c3c; color: white; border-radius: 4px; cursor: pointer; font-weight: bold; }
     .btn-danger:hover { background: #c0392b; }
   </style>
+  <!-- Inclusion de html2pdf.js pour la génération de PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -110,6 +119,9 @@
     <symbol id="icon-download" viewBox="0 0 24 24">
       <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
     </symbol>
+    <symbol id="icon-pdf" viewBox="0 0 24 24">
+      <path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm12 6V9c0-.55-.45-1-1-1h-3v6h1.5v-2H15c.55 0 1-.45 1-1zm-2.5-1.5h1v1h-1v-1z"/>
+    </symbol>
     <symbol id="icon-check" viewBox="0 0 24 24">
       <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
     </symbol>
@@ -120,17 +132,22 @@
       <svg class="icon"><use href="#icon-plus"></use></svg>
       Nouveau document
     </button>
-    <div class="header-tools">
-      <select id="sortSelect" class="sort-select" onchange="chargerListeDocs()">
-        <option value="recent">Tri : Plus récents</option>
-        <option value="alpha">Tri : Alphabetique (A-Z)</option>
-      </select>
-      <input type="text" class="search-box" id="searchInput" placeholder="Rechercher..." oninput="chargerListeDocs()">
-    </div>
   </header>
 
   <main>
-    <aside class="sidebar" id="docList"></aside>
+    <aside class="sidebar">
+      <!-- En-tête de la Sidebar avec Recherche & Tri -->
+      <div class="sidebar-header">
+        <input type="text" class="search-box" id="searchInput" placeholder="Rechercher un document..." oninput="chargerListeDocs()">
+        <select id="sortSelect" class="sort-select" onchange="chargerListeDocs()">
+          <option value="recent">Tri : Plus récents</option>
+          <option value="alpha">Tri : Alphabetique (A-Z)</option>
+        </select>
+      </div>
+
+      <!-- Liste des documents -->
+      <div class="doc-list-container" id="docList"></div>
+    </aside>
 
     <section class="editor-container" id="editorArea" style="display:none;">
       <div class="doc-header-details">
@@ -152,12 +169,15 @@
             <svg class="icon icon-sm"><use href="#icon-download"></use></svg>
             .MD
           </button>
+          <button class="btn-tool btn-pdf" onclick="exporterPDF()" title="Exporter au format PDF">
+            <svg class="icon icon-sm"><use href="#icon-pdf"></use></svg>
+            .PDF
+          </button>
         </div>
       </div>
       
       <textarea id="docContent" class="doc-textarea" placeholder="Rédigez votre texte ici..." oninput="calculerStats()"></textarea>
       
-      <!-- Bouton d'enregistrement sous la feuille -->
       <div class="editor-footer-actions">
         <button class="btn-save" onclick="enregistrerDocument()">
           <svg class="icon"><use href="#icon-save"></use></svg>
@@ -185,7 +205,7 @@
   </div>
 
   <script>
-    let currentDocId = null; // null indique qu'il s'agit d'un nouveau document non encore enregistré
+    let currentDocId = null;
     let docIdToSubmit = null;
     let localDocs = {};
 
@@ -196,13 +216,11 @@
              ' à ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
     }
 
-    // Filtre les documents sans titre ou vides pour qu'ils n'apparaissent jamais dans la sidebar
     async function chargerListeDocs() {
       const q = document.getElementById('searchInput').value;
       const res = await fetch(`/api/docs?q=${encodeURIComponent(q)}`);
       let docs = await res.json();
       
-      // Exclusion stricte des intitulés génériques "document sans titre" si vous en aviez en BD
       docs = docs.filter(d => d.title && d.title.trim() !== '' && d.title.toLowerCase() !== 'document sans titre');
 
       docs = docs.map(d => {
@@ -274,7 +292,6 @@
       document.getElementById('docTitle').focus();
     }
 
-    // Ouvre une zone de travail vierge sans créer de document en backend
     function creerNouveauBrouillon() {
       currentDocId = null;
       document.getElementById('docTitle').value = '';
@@ -286,12 +303,10 @@
       chargerListeDocs();
     }
 
-    // Fonction d'enregistrement sur action manuelle du bouton "Enregistrer"
     async function enregistrerDocument() {
       const content = document.getElementById('docContent').value;
       let title = document.getElementById('docTitle').value.trim();
 
-      // Si aucun titre n'est saisi, déduire le titre depuis les premiers mots du contenu
       if (!title) {
         if (content.trim()) {
           title = content.trim().split('\n')[0].substring(0, 30);
@@ -305,7 +320,6 @@
       const nowIso = new Date().toISOString();
 
       if (currentDocId === null) {
-        // Premier enregistrement : création effective sur l'API
         const res = await fetch('/api/docs', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -314,7 +328,6 @@
         const newDoc = await res.json();
         currentDocId = newDoc.id;
         
-        // Mise à jour si l'API n'a pas pris directement le contenu transmis
         await fetch(`/api/docs/${currentDocId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -323,7 +336,6 @@
 
         localDocs[currentDocId] = { isPinned: false, updatedAt: nowIso };
       } else {
-        // Mise à jour du document existant
         await fetch(`/api/docs/${currentDocId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -339,7 +351,6 @@
       document.getElementById('saveStatus').innerText = "Enregistré avec succès";
       document.getElementById('saveStatus').className = "status-saved";
 
-      // Actualise la barre latérale : le document apparaît maintenant ici !
       chargerListeDocs();
     }
 
@@ -373,6 +384,49 @@
       link.download = filename;
       link.click();
       URL.revokeObjectURL(link.href);
+    }
+
+    function exporterPDF() {
+      const title = document.getElementById('docTitle').value.trim() || 'Document';
+      const content = document.getElementById('docContent').value;
+
+      if (!content.trim()) {
+        alert("Le document est vide, impossible d'exporter un PDF.");
+        return;
+      }
+
+      const pdfContainer = document.createElement('div');
+      pdfContainer.style.padding = '30px';
+      pdfContainer.style.fontFamily = 'Segoe UI, Helvetica, Arial, sans-serif';
+      pdfContainer.style.color = '#2c3e50';
+
+      const h1 = document.createElement('h1');
+      h1.textContent = title;
+      h1.style.fontSize = '24pt';
+      h1.style.borderBottom = '2px solid #2c3e50';
+      h1.style.paddingBottom = '10px';
+      h1.style.marginBottom = '20px';
+
+      const p = document.createElement('div');
+      p.style.fontSize = '12pt';
+      p.style.lineHeight = '1.6';
+      p.style.whiteSpace = 'pre-wrap';
+      p.textContent = content;
+
+      pdfContainer.appendChild(h1);
+      pdfContainer.appendChild(p);
+
+      const filename = `${title.toLowerCase().replace(/[^a-z0-9]/gi, '_')}.pdf`;
+
+      const opt = {
+        margin:       15,
+        filename:     filename,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(pdfContainer).save();
     }
 
     function supprimerDocument(id) {
