@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title> Bloc-NotesFelixtine Pro</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; height: 100vh; display: flex; flex-direction: column; background: #f5f5f5; }
+    
+    /* Barre d'outils supérieure */
+    header { background: #2c3e50; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .search-box { padding: 6px 12px; border-radius: 4px; border: none; width: 220px; }
+    .btn-new { background: #27ae60; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .btn-new:hover { background: #219653; }
+
+    /* Disposition principale (Sidebar + Zone de travail) */
+    main { display: flex; flex: 1; overflow: hidden; }
+
+    /* Sidebar liste des fichiers */
+    .sidebar { width: 280px; background: #ffffff; border-right: 1px solid #e0e0e0; overflow-y: auto; }
+    .doc-item { padding: 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .doc-item:hover { background: #f8f9fa; }
+    .doc-item.active { background: #e8f0fe; border-left: 4px solid #1a73e8; }
+    .doc-item .title { font-weight: 600; font-size: 14px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+    .btn-del { background: transparent; color: #e74c3c; border: none; font-size: 16px; cursor: pointer; padding: 2px 6px; }
+
+    /* Zone d'édition */
+    .editor-container { flex: 1; display: flex; flex-direction: column; background: #ffffff; padding: 20px 40px; }
+    .doc-title-input { font-size: 24px; font-weight: bold; border: none; outline: none; margin-bottom: 15px; border-bottom: 2px solid transparent; width: 100%; color: #2c3e50; }
+    .doc-title-input:focus { border-bottom-color: #3498db; }
+    .doc-textarea { flex: 1; border: none; outline: none; font-size: 16px; line-height: 1.6; resize: none; font-family: 'Courier New', Courier, monospace; color: #2c3e50; }
+
+    /* Pied de page et statistiques */
+    footer { background: #ecf0f1; padding: 6px 20px; font-size: 12px; color: #7f8c8d; display: flex; justify-content: space-between; border-top: 1px solid #bdc3c7; }
+    .status-saved { color: #27ae60; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <button class="btn-new" onclick="creerDocument()">+ Nouveau document</button>
+    <input type="text" class="search-box" id="searchInput" placeholder="Rechercher..." oninput="chargerListeDocs()">
+  </header>
+
+  <main>
+    <aside class="sidebar" id="docList"></aside>
+
+    <section class="editor-container" id="editorArea" style="display:none;">
+      <input type="text" id="docTitle" class="doc-title-input" placeholder="Titre du document..." oninput="autoSave()">
+      <textarea id="docContent" class="doc-textarea" placeholder="Commencez à écrire ici..." oninput="autoSave()"></textarea>
+    </section>
+  </main>
+
+  <footer>
+    <div id="stats">0 Mots | 0 Caractères</div>
+    <div id="saveStatus" class="status-saved">Prêt</div>
+  </footer>
+
+  <script>
+    let currentDocId = null;
+    let saveTimeout = null;
+
+    // Charger la liste des fichiers depuis le backend
+    async function chargerListeDocs() {
+      const q = document.getElementById('searchInput').value;
+      const res = await fetch(`/api/docs?q=${encodeURIComponent(q)}`);
+      const docs = await res.json();
+      
+      const listHtml = docs.map(d => `
+        <div class="doc-item ${d.id === currentDocId ? 'active' : ''}" onclick="ouvrirDocument(${d.id})">
+          <span class="title">${d.title || 'Document sans titre'}</span>
+          <button class="btn-del" onclick="event.stopPropagation(); supprimerDocument(${d.id})">×</button>
+        </div>
+      `).join('');
+
+      document.getElementById('docList').innerHTML = listHtml;
+    }
+
+    // Ouvrir un fichier spécifique dans l'éditeur
+    async function ouvrirDocument(id) {
+      currentDocId = id;
+      const res = await fetch(`/api/docs/${id}`);
+      const doc = await res.json();
+
+      document.getElementById('docTitle').value = doc.title;
+      document.getElementById('docContent').value = doc.content || '';
+      document.getElementById('editorArea').style.display = 'flex';
+
+      calculerStats();
+      chargerListeDocs();
+    }
+
+    // Créer un nouveau document
+    async function creerDocument() {
+      const res = await fetch('/api/docs', { method: 'POST' });
+      const newDoc = await res.json();
+      ouvrirDocument(newDoc.id);
+    }
+
+    // Auto-sauvegarde intelligente
+    function autoSave() {
+      calculerStats();
+      document.getElementById('saveStatus').innerText = "Enregistrement...";
+      document.getElementById('saveStatus').className = "";
+
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(async () => {
+        if (!currentDocId) return;
+
+        const title = document.getElementById('docTitle').value;
+        const content = document.getElementById('docContent').value;
+
+        await fetch(`/api/docs/${currentDocId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, content })
+        });
+
+        document.getElementById('saveStatus').innerText = "Enregistré";
+        document.getElementById('saveStatus').className = "status-saved";
+        chargerListeDocs();
+      }, 500);
+    }
+
+    // Supprimer un document
+    async function supprimerDocument(id) {
+      if (!confirm("Voulez-vous vraiment supprimer ce document ?")) return;
+      await fetch(`/api/docs/${id}`, { method: 'DELETE' });
+      if (currentDocId === id) {
+        currentDocId = null;
+        document.getElementById('editorArea').style.display = 'none';
+      }
+      chargerListeDocs();
+    }
+
+    // Calcul du nombre de mots et caractères
+    function calculerStats() {
+      const text = document.getElementById('docContent').value;
+      const charCount = text.length;
+      const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+      document.getElementById('stats').innerText = `${wordCount} Mots | ${charCount} Caractères`;
+    }
+
+    // Lancement initial
+    chargerListeDocs();
+  </script>
+</body>
+</html>
