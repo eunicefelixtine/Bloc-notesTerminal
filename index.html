@@ -7,13 +7,17 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; height: 100vh; display: flex; flex-direction: column; background: #f5f5f5; }
     
+    /* Icons standard dimensions */
+    .icon { width: 16px; height: 16px; fill: currentColor; vertical-align: middle; display: inline-block; }
+    .icon-sm { width: 14px; height: 14px; }
+
     /* Barre d'outils supérieure */
     header { background: #2c3e50; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
     .header-tools { display: flex; gap: 10px; align-items: center; }
     .search-box, .sort-select { padding: 6px 12px; border-radius: 4px; border: none; font-size: 14px; }
     .search-box { width: 180px; }
     .sort-select { background: #ffffff; color: #2c3e50; cursor: pointer; }
-    .btn-new { background: #27ae60; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .btn-new { background: #27ae60; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 6px; }
     .btn-new:hover { background: #219653; }
 
     /* Disposition principale */
@@ -33,14 +37,14 @@
 
     /* Boutons d'actions sidebar */
     .actions { display: flex; gap: 4px; align-items: center; }
-    .btn-action { background: transparent; border: none; font-size: 14px; cursor: pointer; padding: 4px; border-radius: 4px; transition: background 0.2s; }
-    .btn-pin { color: #ccc; }
-    .btn-pin.is-pinned { color: #f1c40f; }
-    .btn-pin:hover { background: #fef9e7; }
+    .btn-action { background: transparent; border: none; cursor: pointer; padding: 4px 6px; border-radius: 4px; transition: background 0.2s, color 0.2s; display: flex; align-items: center; justify-content: center; }
+    .btn-pin { color: #bdc3c7; }
+    .btn-pin.is-pinned { color: #f39c12; }
+    .btn-pin:hover { background: #fef9e7; color: #f1c40f; }
     .btn-edit { color: #3498db; }
-    .btn-edit:hover { background: #ebf5fb; }
-    .btn-del { color: #e74c3c; font-size: 16px; }
-    .btn-del:hover { background: #fadbd8; }
+    .btn-edit:hover { background: #ebf5fb; color: #2980b9; }
+    .btn-del { color: #e74c3c; }
+    .btn-del:hover { background: #fadbd8; color: #c0392b; }
 
     /* Zone d'édition */
     .editor-container { flex: 1; display: flex; flex-direction: column; background: #ffffff; padding: 20px 40px; }
@@ -49,15 +53,20 @@
     .doc-title-input { font-size: 24px; font-weight: bold; border: none; outline: none; margin-bottom: 5px; width: 100%; color: #2c3e50; }
     .doc-timestamp { font-size: 12px; color: #7f8c8d; font-style: italic; }
     
-    /* Barre d'outils d'exportation et de copie */
+    /* Barre d'outils Copie et Exportation */
     .editor-toolbar { display: flex; gap: 8px; }
-    .btn-tool { background: #f8f9fa; border: 1px solid #dcdfe6; color: #606266; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 4px; transition: all 0.2s; }
+    .btn-tool { background: #f8f9fa; border: 1px solid #dcdfe6; color: #606266; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
     .btn-tool:hover { background: #ecf5ff; color: #409eff; border-color: #c6e2ff; }
-    .btn-tool-copy:active { background: #e6a23c; color: white; }
 
-    .doc-textarea { flex: 1; border: none; outline: none; font-size: 16px; line-height: 1.6; resize: none; font-family: 'Courier New', Courier, monospace; color: #2c3e50; }
+    .doc-textarea { flex: 1; border: 1px solid #f0f0f0; border-radius: 6px; padding: 15px; outline: none; font-size: 16px; line-height: 1.6; resize: none; font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; color: #2c3e50; margin-bottom: 15px; }
+    .doc-textarea:focus { border-color: #409eff; }
 
-    /* Pied de page */
+    /* Bas de page d'édition : Bouton Enregistrer */
+    .editor-footer-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 5px; }
+    .btn-save { background: #1a73e8; color: white; border: none; padding: 10px 24px; border-radius: 4px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.2s; }
+    .btn-save:hover { background: #1557b0; }
+
+    /* Pied de page global */
     footer { background: #ecf0f1; padding: 6px 20px; font-size: 12px; color: #7f8c8d; display: flex; justify-content: space-between; border-top: 1px solid #bdc3c7; }
     .status-saved { color: #27ae60; font-weight: bold; }
 
@@ -75,8 +84,42 @@
 </head>
 <body>
 
+  <!-- Sprite SVG Icones -->
+  <svg style="display: none;">
+    <symbol id="icon-plus" viewBox="0 0 24 24">
+      <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+    </symbol>
+    <symbol id="icon-save" viewBox="0 0 24 24">
+      <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+    </symbol>
+    <symbol id="icon-star-filled" viewBox="0 0 24 24">
+      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+    </symbol>
+    <symbol id="icon-star-outline" viewBox="0 0 24 24">
+      <path d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"/>
+    </symbol>
+    <symbol id="icon-edit" viewBox="0 0 24 24">
+      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+    </symbol>
+    <symbol id="icon-delete" viewBox="0 0 24 24">
+      <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+    </symbol>
+    <symbol id="icon-copy" viewBox="0 0 24 24">
+      <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+    </symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24">
+      <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+    </symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24">
+      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+    </symbol>
+  </svg>
+
   <header>
-    <button class="btn-new" onclick="creerDocument()">+ Nouveau document</button>
+    <button class="btn-new" onclick="creerNouveauBrouillon()">
+      <svg class="icon"><use href="#icon-plus"></use></svg>
+      Nouveau document
+    </button>
     <div class="header-tools">
       <select id="sortSelect" class="sort-select" onchange="chargerListeDocs()">
         <option value="recent">Tri : Plus récents</option>
@@ -92,18 +135,35 @@
     <section class="editor-container" id="editorArea" style="display:none;">
       <div class="doc-header-details">
         <div class="doc-header-left">
-          <input type="text" id="docTitle" class="doc-title-input" placeholder="Titre du document..." oninput="autoSave()">
-          <div id="docTimestamp" class="doc-timestamp">Dernière modification : --</div>
+          <input type="text" id="docTitle" class="doc-title-input" placeholder="Donnez un titre à votre document..." oninput="calculerStats()">
+          <div id="docTimestamp" class="doc-timestamp">Nouveau document (Non enregistré)</div>
         </div>
         
-        <!-- Barre d'outils Copie et Exportation -->
         <div class="editor-toolbar">
-          <button class="btn-tool btn-tool-copy" id="btnCopy" onclick="copierTexte()" title="Copier tout le texte">📋 Copier</button>
-          <button class="btn-tool" onclick="exporterDocument('txt')" title="Exporter en .txt">📥 .TXT</button>
-          <button class="btn-tool" onclick="exporterDocument('md')" title="Exporter en .md">📥 .MD</button>
+          <button class="btn-tool btn-tool-copy" id="btnCopy" onclick="copierTexte()" title="Copier tout le texte">
+            <svg class="icon icon-sm" id="iconCopyState"><use href="#icon-copy"></use></svg>
+            <span id="textCopyState">Copier</span>
+          </button>
+          <button class="btn-tool" onclick="exporterDocument('txt')" title="Exporter en .txt">
+            <svg class="icon icon-sm"><use href="#icon-download"></use></svg>
+            .TXT
+          </button>
+          <button class="btn-tool" onclick="exporterDocument('md')" title="Exporter en .md">
+            <svg class="icon icon-sm"><use href="#icon-download"></use></svg>
+            .MD
+          </button>
         </div>
       </div>
-      <textarea id="docContent" class="doc-textarea" placeholder="Commencez à écrire ici..." oninput="autoSave()"></textarea>
+      
+      <textarea id="docContent" class="doc-textarea" placeholder="Rédigez votre texte ici..." oninput="calculerStats()"></textarea>
+      
+      <!-- Bouton d'enregistrement sous la feuille -->
+      <div class="editor-footer-actions">
+        <button class="btn-save" onclick="enregistrerDocument()">
+          <svg class="icon"><use href="#icon-save"></use></svg>
+          Enregistrer le document
+        </button>
+      </div>
     </section>
   </main>
 
@@ -125,9 +185,8 @@
   </div>
 
   <script>
-    let currentDocId = null;
+    let currentDocId = null; // null indique qu'il s'agit d'un nouveau document non encore enregistré
     let docIdToSubmit = null;
-    let saveTimeout = null;
     let localDocs = {};
 
     function formaterDate(isoString) {
@@ -137,11 +196,15 @@
              ' à ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
     }
 
+    // Filtre les documents sans titre ou vides pour qu'ils n'apparaissent jamais dans la sidebar
     async function chargerListeDocs() {
       const q = document.getElementById('searchInput').value;
       const res = await fetch(`/api/docs?q=${encodeURIComponent(q)}`);
       let docs = await res.json();
       
+      // Exclusion stricte des intitulés génériques "document sans titre" si vous en aviez en BD
+      docs = docs.filter(d => d.title && d.title.trim() !== '' && d.title.toLowerCase() !== 'document sans titre');
+
       docs = docs.map(d => {
         const localData = localDocs[d.id] || {};
         return {
@@ -164,13 +227,19 @@
       const listHtml = docs.map(d => `
         <div class="doc-item ${d.id === currentDocId ? 'active' : ''} ${d.isPinned ? 'pinned' : ''}" onclick="ouvrirDocument(${d.id})">
           <div class="doc-info">
-            <span class="title">${d.title || 'Document sans titre'}</span>
+            <span class="title">${d.title}</span>
             <span class="date-preview">${formaterDate(d.updatedAt)}</span>
           </div>
           <div class="actions">
-            <button class="btn-action btn-pin ${d.isPinned ? 'is-pinned' : ''}" title="${d.isPinned ? 'Désépingler' : 'Épingler'}" onclick="event.stopPropagation(); basculerEpinglage(${d.id})">⭐</button>
-            <button class="btn-action btn-edit" title="Éditer" onclick="event.stopPropagation(); editerDocument(${d.id})">✏️</button>
-            <button class="btn-action btn-del" title="Supprimer" onclick="event.stopPropagation(); supprimerDocument(${d.id})">×</button>
+            <button class="btn-action btn-pin ${d.isPinned ? 'is-pinned' : ''}" title="${d.isPinned ? 'Désépingler' : 'Épingler'}" onclick="event.stopPropagation(); basculerEpinglage(${d.id})">
+              <svg class="icon"><use href="${d.isPinned ? '#icon-star-filled' : '#icon-star-outline'}"></use></svg>
+            </button>
+            <button class="btn-action btn-edit" title="Éditer" onclick="event.stopPropagation(); editerDocument(${d.id})">
+              <svg class="icon"><use href="#icon-edit"></use></svg>
+            </button>
+            <button class="btn-action btn-del" title="Supprimer" onclick="event.stopPropagation(); supprimerDocument(${d.id})">
+              <svg class="icon"><use href="#icon-delete"></use></svg>
+            </button>
           </div>
         </div>
       `).join('');
@@ -191,7 +260,7 @@
 
       const lastModified = (localDocs[id] && localDocs[id].updatedAt) || new Date().toISOString();
 
-      document.getElementById('docTitle').value = doc.title;
+      document.getElementById('docTitle').value = doc.title || '';
       document.getElementById('docContent').value = doc.content || '';
       document.getElementById('docTimestamp').innerText = `Dernière modification : ${formaterDate(lastModified)}`;
       document.getElementById('editorArea').style.display = 'flex';
@@ -205,26 +274,56 @@
       document.getElementById('docTitle').focus();
     }
 
-    async function creerDocument() {
-      const res = await fetch('/api/docs', { method: 'POST' });
-      const newDoc = await res.json();
-      localDocs[newDoc.id] = { isPinned: false, updatedAt: new Date().toISOString() };
-      ouvrirDocument(newDoc.id);
+    // Ouvre une zone de travail vierge sans créer de document en backend
+    function creerNouveauBrouillon() {
+      currentDocId = null;
+      document.getElementById('docTitle').value = '';
+      document.getElementById('docContent').value = '';
+      document.getElementById('docTimestamp').innerText = 'Nouveau document (Non enregistré)';
+      document.getElementById('editorArea').style.display = 'flex';
+      document.getElementById('docTitle').focus();
+      calculerStats();
+      chargerListeDocs();
     }
 
-    function autoSave() {
-      calculerStats();
-      document.getElementById('saveStatus').innerText = "Enregistrement...";
-      document.getElementById('saveStatus').className = "";
+    // Fonction d'enregistrement sur action manuelle du bouton "Enregistrer"
+    async function enregistrerDocument() {
+      const content = document.getElementById('docContent').value;
+      let title = document.getElementById('docTitle').value.trim();
 
-      clearTimeout(saveTimeout);
-      saveTimeout = setTimeout(async () => {
-        if (!currentDocId) return;
+      // Si aucun titre n'est saisi, déduire le titre depuis les premiers mots du contenu
+      if (!title) {
+        if (content.trim()) {
+          title = content.trim().split('\n')[0].substring(0, 30);
+        } else {
+          alert("Veuillez saisir un titre ou rédiger un contenu avant d'enregistrer.");
+          return;
+        }
+      }
 
-        const title = document.getElementById('docTitle').value;
-        const content = document.getElementById('docContent').value;
-        const nowIso = new Date().toISOString();
+      document.getElementById('saveStatus').innerText = "Enregistrement en cours...";
+      const nowIso = new Date().toISOString();
 
+      if (currentDocId === null) {
+        // Premier enregistrement : création effective sur l'API
+        const res = await fetch('/api/docs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, content })
+        });
+        const newDoc = await res.json();
+        currentDocId = newDoc.id;
+        
+        // Mise à jour si l'API n'a pas pris directement le contenu transmis
+        await fetch(`/api/docs/${currentDocId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, content })
+        });
+
+        localDocs[currentDocId] = { isPinned: false, updatedAt: nowIso };
+      } else {
+        // Mise à jour du document existant
         await fetch(`/api/docs/${currentDocId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -233,27 +332,35 @@
 
         if (!localDocs[currentDocId]) localDocs[currentDocId] = {};
         localDocs[currentDocId].updatedAt = nowIso;
+      }
 
-        document.getElementById('docTimestamp').innerText = `Dernière modification : ${formaterDate(nowIso)}`;
-        document.getElementById('saveStatus').innerText = "Enregistré";
-        document.getElementById('saveStatus').className = "status-saved";
-        chargerListeDocs();
-      }, 500);
+      document.getElementById('docTitle').value = title;
+      document.getElementById('docTimestamp').innerText = `Dernière modification : ${formaterDate(nowIso)}`;
+      document.getElementById('saveStatus').innerText = "Enregistré avec succès";
+      document.getElementById('saveStatus').className = "status-saved";
+
+      // Actualise la barre latérale : le document apparaît maintenant ici !
+      chargerListeDocs();
     }
 
-    // Copier le contenu dans le presse-papier
     function copierTexte() {
       const text = document.getElementById('docContent').value;
       if (!text) return;
 
       navigator.clipboard.writeText(text).then(() => {
-        const btn = document.getElementById('btnCopy');
-        btn.innerText = "✅ Copié !";
-        setTimeout(() => { btn.innerText = "📋 Copier"; }, 1500);
+        const iconUse = document.querySelector('#iconCopyState use');
+        const textSpan = document.getElementById('textCopyState');
+
+        iconUse.setAttribute('href', '#icon-check');
+        textSpan.innerText = "Copié !";
+
+        setTimeout(() => {
+          iconUse.setAttribute('href', '#icon-copy');
+          textSpan.innerText = "Copier";
+        }, 1500);
       });
     }
 
-    // Exporter le fichier (.txt ou .md)
     function exporterDocument(extension) {
       const title = document.getElementById('docTitle').value || 'document';
       const content = document.getElementById('docContent').value || '';
