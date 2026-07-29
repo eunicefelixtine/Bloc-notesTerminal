@@ -31,7 +31,7 @@
     .doc-item .title { font-weight: 600; font-size: 14px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .doc-item .date-preview { font-size: 11px; color: #888; }
 
-    /* Boutons d'actions */
+    /* Boutons d'actions sidebar */
     .actions { display: flex; gap: 4px; align-items: center; }
     .btn-action { background: transparent; border: none; font-size: 14px; cursor: pointer; padding: 4px; border-radius: 4px; transition: background 0.2s; }
     .btn-pin { color: #ccc; }
@@ -44,9 +44,17 @@
 
     /* Zone d'édition */
     .editor-container { flex: 1; display: flex; flex-direction: column; background: #ffffff; padding: 20px 40px; }
-    .doc-header-details { margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+    .doc-header-details { margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .doc-header-left { flex: 1; margin-right: 20px; }
     .doc-title-input { font-size: 24px; font-weight: bold; border: none; outline: none; margin-bottom: 5px; width: 100%; color: #2c3e50; }
     .doc-timestamp { font-size: 12px; color: #7f8c8d; font-style: italic; }
+    
+    /* Barre d'outils d'exportation et de copie */
+    .editor-toolbar { display: flex; gap: 8px; }
+    .btn-tool { background: #f8f9fa; border: 1px solid #dcdfe6; color: #606266; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 4px; transition: all 0.2s; }
+    .btn-tool:hover { background: #ecf5ff; color: #409eff; border-color: #c6e2ff; }
+    .btn-tool-copy:active { background: #e6a23c; color: white; }
+
     .doc-textarea { flex: 1; border: none; outline: none; font-size: 16px; line-height: 1.6; resize: none; font-family: 'Courier New', Courier, monospace; color: #2c3e50; }
 
     /* Pied de page */
@@ -83,8 +91,17 @@
 
     <section class="editor-container" id="editorArea" style="display:none;">
       <div class="doc-header-details">
-        <input type="text" id="docTitle" class="doc-title-input" placeholder="Titre du document..." oninput="autoSave()">
-        <div id="docTimestamp" class="doc-timestamp">Dernière modification : --</div>
+        <div class="doc-header-left">
+          <input type="text" id="docTitle" class="doc-title-input" placeholder="Titre du document..." oninput="autoSave()">
+          <div id="docTimestamp" class="doc-timestamp">Dernière modification : --</div>
+        </div>
+        
+        <!-- Barre d'outils Copie et Exportation -->
+        <div class="editor-toolbar">
+          <button class="btn-tool btn-tool-copy" id="btnCopy" onclick="copierTexte()" title="Copier tout le texte">📋 Copier</button>
+          <button class="btn-tool" onclick="exporterDocument('txt')" title="Exporter en .txt">📥 .TXT</button>
+          <button class="btn-tool" onclick="exporterDocument('md')" title="Exporter en .md">📥 .MD</button>
+        </div>
       </div>
       <textarea id="docContent" class="doc-textarea" placeholder="Commencez à écrire ici..." oninput="autoSave()"></textarea>
     </section>
@@ -113,7 +130,6 @@
     let saveTimeout = null;
     let localDocs = {};
 
-    // Formater la date proprement
     function formaterDate(isoString) {
       if (!isoString) return 'Récemment';
       const d = new Date(isoString);
@@ -121,13 +137,11 @@
              ' à ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
     }
 
-    // Charger la liste des fichiers
     async function chargerListeDocs() {
       const q = document.getElementById('searchInput').value;
       const res = await fetch(`/api/docs?q=${encodeURIComponent(q)}`);
       let docs = await res.json();
       
-      // Récupérer les états d'épinglage et dates locales
       docs = docs.map(d => {
         const localData = localDocs[d.id] || {};
         return {
@@ -137,7 +151,6 @@
         };
       });
 
-      // Tri dynamique (Favoris toujours en haut)
       const sortMode = document.getElementById('sortSelect').value;
       docs.sort((a, b) => {
         if (a.isPinned !== b.isPinned) return b.isPinned ? 1 : -1;
@@ -165,14 +178,12 @@
       document.getElementById('docList').innerHTML = listHtml;
     }
 
-    // Basculer le statut épinglé/favori
     function basculerEpinglage(id) {
       if (!localDocs[id]) localDocs[id] = {};
       localDocs[id].isPinned = !localDocs[id].isPinned;
       chargerListeDocs();
     }
 
-    // Ouvrir un fichier spécifique
     async function ouvrirDocument(id) {
       currentDocId = id;
       const res = await fetch(`/api/docs/${id}`);
@@ -189,13 +200,11 @@
       chargerListeDocs();
     }
 
-    // Action d'édition
     async function editerDocument(id) {
       await ouvrirDocument(id);
       document.getElementById('docTitle').focus();
     }
 
-    // Créer un nouveau document
     async function creerDocument() {
       const res = await fetch('/api/docs', { method: 'POST' });
       const newDoc = await res.json();
@@ -203,7 +212,6 @@
       ouvrirDocument(newDoc.id);
     }
 
-    // Auto-sauvegarde avec mise à jour du timestamp
     function autoSave() {
       calculerStats();
       document.getElementById('saveStatus').innerText = "Enregistrement...";
@@ -233,7 +241,33 @@
       }, 500);
     }
 
-    // Suppression
+    // Copier le contenu dans le presse-papier
+    function copierTexte() {
+      const text = document.getElementById('docContent').value;
+      if (!text) return;
+
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('btnCopy');
+        btn.innerText = "✅ Copié !";
+        setTimeout(() => { btn.innerText = "📋 Copier"; }, 1500);
+      });
+    }
+
+    // Exporter le fichier (.txt ou .md)
+    function exporterDocument(extension) {
+      const title = document.getElementById('docTitle').value || 'document';
+      const content = document.getElementById('docContent').value || '';
+      
+      const filename = `${title.toLowerCase().replace(/[^a-z0-9]/gi, '_')}.${extension}`;
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
     function supprimerDocument(id) {
       docIdToSubmit = id;
       document.getElementById('confirmModal').style.display = 'flex';
@@ -259,7 +293,6 @@
       chargerListeDocs();
     };
 
-    // Calcul des statistiques
     function calculerStats() {
       const text = document.getElementById('docContent').value;
       const charCount = text.length;
@@ -267,7 +300,6 @@
       document.getElementById('stats').innerText = `${wordCount} Mots | ${charCount} Caractères`;
     }
 
-    // Lancement initial
     chargerListeDocs();
   </script>
 </body>
