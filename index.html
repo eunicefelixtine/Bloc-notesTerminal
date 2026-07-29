@@ -8,56 +8,56 @@
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; height: 100vh; display: flex; flex-direction: column; background: #f5f5f5; }
     
     /* Barre d'outils supérieure */
-    header { background: #2c3e50; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
-    .search-box { padding: 6px 12px; border-radius: 4px; border: none; width: 220px; }
+    header { background: #2c3e50; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .header-tools { display: flex; gap: 10px; align-items: center; }
+    .search-box, .sort-select { padding: 6px 12px; border-radius: 4px; border: none; font-size: 14px; }
+    .search-box { width: 180px; }
+    .sort-select { background: #ffffff; color: #2c3e50; cursor: pointer; }
     .btn-new { background: #27ae60; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; }
     .btn-new:hover { background: #219653; }
 
-    /* Disposition principale (Sidebar + Zone de travail) */
+    /* Disposition principale */
     main { display: flex; flex: 1; overflow: hidden; }
 
     /* Sidebar liste des fichiers */
-    .sidebar { width: 280px; background: #ffffff; border-right: 1px solid #e0e0e0; overflow-y: auto; }
-    .doc-item { padding: 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .sidebar { width: 320px; background: #ffffff; border-right: 1px solid #e0e0e0; overflow-y: auto; }
+    .doc-item { padding: 12px 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
     .doc-item:hover { background: #f8f9fa; }
     .doc-item.active { background: #e8f0fe; border-left: 4px solid #1a73e8; }
-    .doc-item .title { font-weight: 600; font-size: 14px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
-    .btn-del { background: transparent; color: #e74c3c; border: none; font-size: 16px; cursor: pointer; padding: 2px 6px; }
+    .doc-item.pinned { background: #fffde7; }
+    .doc-item.pinned.active { background: #fff8e1; border-left: 4px solid #fbc02d; }
+    
+    .doc-info { display: flex; flex-direction: column; gap: 4px; overflow: hidden; max-width: 170px; }
+    .doc-item .title { font-weight: 600; font-size: 14px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .doc-item .date-preview { font-size: 11px; color: #888; }
+
+    /* Boutons d'actions */
+    .actions { display: flex; gap: 4px; align-items: center; }
+    .btn-action { background: transparent; border: none; font-size: 14px; cursor: pointer; padding: 4px; border-radius: 4px; transition: background 0.2s; }
+    .btn-pin { color: #ccc; }
+    .btn-pin.is-pinned { color: #f1c40f; }
+    .btn-pin:hover { background: #fef9e7; }
+    .btn-edit { color: #3498db; }
+    .btn-edit:hover { background: #ebf5fb; }
+    .btn-del { color: #e74c3c; font-size: 16px; }
+    .btn-del:hover { background: #fadbd8; }
 
     /* Zone d'édition */
     .editor-container { flex: 1; display: flex; flex-direction: column; background: #ffffff; padding: 20px 40px; }
-    .doc-title-input { font-size: 24px; font-weight: bold; border: none; outline: none; margin-bottom: 15px; border-bottom: 2px solid transparent; width: 100%; color: #2c3e50; }
-    .doc-title-input:focus { border-bottom-color: #3498db; }
+    .doc-header-details { margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+    .doc-title-input { font-size: 24px; font-weight: bold; border: none; outline: none; margin-bottom: 5px; width: 100%; color: #2c3e50; }
+    .doc-timestamp { font-size: 12px; color: #7f8c8d; font-style: italic; }
     .doc-textarea { flex: 1; border: none; outline: none; font-size: 16px; line-height: 1.6; resize: none; font-family: 'Courier New', Courier, monospace; color: #2c3e50; }
 
-    /* Pied de page et statistiques */
+    /* Pied de page */
     footer { background: #ecf0f1; padding: 6px 20px; font-size: 12px; color: #7f8c8d; display: flex; justify-content: space-between; border-top: 1px solid #bdc3c7; }
     .status-saved { color: #27ae60; font-weight: bold; }
 
-    /* Style de la Fenêtre Modale de Suppression */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal-box {
-      background: #ffffff;
-      padding: 24px;
-      border-radius: 8px;
-      width: 320px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      text-align: center;
-    }
-
+    /* Style Modale */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-box { background: #ffffff; padding: 24px; border-radius: 8px; width: 320px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); text-align: center; }
     .modal-box h3 { margin-bottom: 10px; color: #2c3e50; }
     .modal-box p { font-size: 14px; color: #666; margin-bottom: 20px; }
-
     .modal-actions { display: flex; justify-content: space-between; gap: 10px; }
     .btn-cancel { flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer; font-weight: 500; }
     .btn-cancel:hover { background: #f0f0f0; }
@@ -69,14 +69,23 @@
 
   <header>
     <button class="btn-new" onclick="creerDocument()">+ Nouveau document</button>
-    <input type="text" class="search-box" id="searchInput" placeholder="Rechercher..." oninput="chargerListeDocs()">
+    <div class="header-tools">
+      <select id="sortSelect" class="sort-select" onchange="chargerListeDocs()">
+        <option value="recent">Tri : Plus récents</option>
+        <option value="alpha">Tri : Alphabetique (A-Z)</option>
+      </select>
+      <input type="text" class="search-box" id="searchInput" placeholder="Rechercher..." oninput="chargerListeDocs()">
+    </div>
   </header>
 
   <main>
     <aside class="sidebar" id="docList"></aside>
 
     <section class="editor-container" id="editorArea" style="display:none;">
-      <input type="text" id="docTitle" class="doc-title-input" placeholder="Titre du document..." oninput="autoSave()">
+      <div class="doc-header-details">
+        <input type="text" id="docTitle" class="doc-title-input" placeholder="Titre du document..." oninput="autoSave()">
+        <div id="docTimestamp" class="doc-timestamp">Dernière modification : --</div>
+      </div>
       <textarea id="docContent" class="doc-textarea" placeholder="Commencez à écrire ici..." oninput="autoSave()"></textarea>
     </section>
   </main>
@@ -86,7 +95,7 @@
     <div id="saveStatus" class="status-saved">Prêt</div>
   </footer>
 
-  <!-- Fenêtre Modale sur-mesure -->
+  <!-- Modale de Confirmation -->
   <div id="confirmModal" class="modal-overlay" style="display: none;">
     <div class="modal-box">
       <h3>Confirmation</h3>
@@ -102,21 +111,65 @@
     let currentDocId = null;
     let docIdToSubmit = null;
     let saveTimeout = null;
+    let localDocs = {};
 
-    // Charger la liste des fichiers depuis le backend
+    // Formater la date proprement
+    function formaterDate(isoString) {
+      if (!isoString) return 'Récemment';
+      const d = new Date(isoString);
+      return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) + 
+             ' à ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // Charger la liste des fichiers
     async function chargerListeDocs() {
       const q = document.getElementById('searchInput').value;
       const res = await fetch(`/api/docs?q=${encodeURIComponent(q)}`);
-      const docs = await res.json();
+      let docs = await res.json();
       
+      // Récupérer les états d'épinglage et dates locales
+      docs = docs.map(d => {
+        const localData = localDocs[d.id] || {};
+        return {
+          ...d,
+          isPinned: localData.isPinned || false,
+          updatedAt: localData.updatedAt || new Date().toISOString()
+        };
+      });
+
+      // Tri dynamique (Favoris toujours en haut)
+      const sortMode = document.getElementById('sortSelect').value;
+      docs.sort((a, b) => {
+        if (a.isPinned !== b.isPinned) return b.isPinned ? 1 : -1;
+        if (sortMode === 'alpha') {
+          return (a.title || '').localeCompare(b.title || '');
+        } else {
+          return new Date(b.updatedAt) - new Date(a.updatedAt);
+        }
+      });
+
       const listHtml = docs.map(d => `
-        <div class="doc-item ${d.id === currentDocId ? 'active' : ''}" onclick="ouvrirDocument(${d.id})">
-          <span class="title">${d.title || 'Document sans titre'}</span>
-          <button class="btn-del" onclick="event.stopPropagation(); supprimerDocument(${d.id})">×</button>
+        <div class="doc-item ${d.id === currentDocId ? 'active' : ''} ${d.isPinned ? 'pinned' : ''}" onclick="ouvrirDocument(${d.id})">
+          <div class="doc-info">
+            <span class="title">${d.title || 'Document sans titre'}</span>
+            <span class="date-preview">${formaterDate(d.updatedAt)}</span>
+          </div>
+          <div class="actions">
+            <button class="btn-action btn-pin ${d.isPinned ? 'is-pinned' : ''}" title="${d.isPinned ? 'Désépingler' : 'Épingler'}" onclick="event.stopPropagation(); basculerEpinglage(${d.id})">⭐</button>
+            <button class="btn-action btn-edit" title="Éditer" onclick="event.stopPropagation(); editerDocument(${d.id})">✏️</button>
+            <button class="btn-action btn-del" title="Supprimer" onclick="event.stopPropagation(); supprimerDocument(${d.id})">×</button>
+          </div>
         </div>
       `).join('');
 
       document.getElementById('docList').innerHTML = listHtml;
+    }
+
+    // Basculer le statut épinglé/favori
+    function basculerEpinglage(id) {
+      if (!localDocs[id]) localDocs[id] = {};
+      localDocs[id].isPinned = !localDocs[id].isPinned;
+      chargerListeDocs();
     }
 
     // Ouvrir un fichier spécifique
@@ -125,22 +178,32 @@
       const res = await fetch(`/api/docs/${id}`);
       const doc = await res.json();
 
+      const lastModified = (localDocs[id] && localDocs[id].updatedAt) || new Date().toISOString();
+
       document.getElementById('docTitle').value = doc.title;
       document.getElementById('docContent').value = doc.content || '';
+      document.getElementById('docTimestamp').innerText = `Dernière modification : ${formaterDate(lastModified)}`;
       document.getElementById('editorArea').style.display = 'flex';
 
       calculerStats();
       chargerListeDocs();
     }
 
+    // Action d'édition
+    async function editerDocument(id) {
+      await ouvrirDocument(id);
+      document.getElementById('docTitle').focus();
+    }
+
     // Créer un nouveau document
     async function creerDocument() {
       const res = await fetch('/api/docs', { method: 'POST' });
       const newDoc = await res.json();
+      localDocs[newDoc.id] = { isPinned: false, updatedAt: new Date().toISOString() };
       ouvrirDocument(newDoc.id);
     }
 
-    // Auto-sauvegarde
+    // Auto-sauvegarde avec mise à jour du timestamp
     function autoSave() {
       calculerStats();
       document.getElementById('saveStatus').innerText = "Enregistrement...";
@@ -152,6 +215,7 @@
 
         const title = document.getElementById('docTitle').value;
         const content = document.getElementById('docContent').value;
+        const nowIso = new Date().toISOString();
 
         await fetch(`/api/docs/${currentDocId}`, {
           method: 'PUT',
@@ -159,29 +223,32 @@
           body: JSON.stringify({ title, content })
         });
 
+        if (!localDocs[currentDocId]) localDocs[currentDocId] = {};
+        localDocs[currentDocId].updatedAt = nowIso;
+
+        document.getElementById('docTimestamp').innerText = `Dernière modification : ${formaterDate(nowIso)}`;
         document.getElementById('saveStatus').innerText = "Enregistré";
         document.getElementById('saveStatus').className = "status-saved";
         chargerListeDocs();
       }, 500);
     }
 
-    // Ouvrir la modale personnalisée
+    // Suppression
     function supprimerDocument(id) {
       docIdToSubmit = id;
       document.getElementById('confirmModal').style.display = 'flex';
     }
 
-    // Fermer la modale
     function fermerModal() {
       docIdToSubmit = null;
       document.getElementById('confirmModal').style.display = 'none';
     }
 
-    // Confirmation de suppression au clic sur la modale
     document.getElementById('btnConfirmDelete').onclick = async function() {
       if (!docIdToSubmit) return;
       
       await fetch(`/api/docs/${docIdToSubmit}`, { method: 'DELETE' });
+      delete localDocs[docIdToSubmit];
       
       if (currentDocId === docIdToSubmit) {
         currentDocId = null;
