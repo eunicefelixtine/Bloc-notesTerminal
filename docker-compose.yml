@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  notepad-app:
+    build: .
+    container_name: bloc_notes_container
+    ports:
+      - "3000:3000"
+    volumes:
+      # Option A : Volume nommé géré par Docker (Recommandé)
+      - sqlite_data:/app/data
+    environment:
+      - PORT=3000
+      # Assure-toi que ton code pointe vers ce chemin pour la BDD (ex: /app/data/notes.db)
+      - DB_PATH=/app/data/notes.db 
+
+volumes:
+  sqlite_data:

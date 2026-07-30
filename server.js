@@ -1,9 +1,20 @@
 const express = require('express');
 const Database = require('better-sqlite3');
+const fs = require('fs');
+const path = require('path');
 const app = express();
 
-//Initialisation/création de la base de données SQLite dans le fichier database.db
-const db = new Database('database.db');
+// Récupération du chemin via la variable d'environnement (ou fallback local)
+const dbPath = process.env.DB_PATH || 'database.db';
+
+// Création du dossier /app/data s'il n'existe pas encore
+const dbDir = path.dirname(dbPath);
+if (dbDir && !fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+}
+
+// Initialisation de SQLite
+const db = new Database(dbPath);
 
 //Creéation de la table 'documents' si elle n'existe pas
 db.exec(`
