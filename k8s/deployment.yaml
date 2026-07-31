@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blocnote-deployment
+  labels:
+    app: blocnote
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: blocnote
+  template:
+    metadata:
+      labels:
+        app: blocnote
+    spec:
+      containers:
+      - name: blocnote
+        image: eunicefelixtine/projet_blocnote:latest
+        ports:
+        - containerPort: 3000
