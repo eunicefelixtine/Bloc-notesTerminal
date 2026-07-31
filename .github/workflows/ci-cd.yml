@@ -36,7 +36,7 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/projet_blocnote:latest
 
-    - name: 6. Valider les manifestes Kubernetes
-      run: |
-        echo "Vérification de la syntaxe des manifestes K8s..."
-        kubectl apply --dry-run=client -f k8s/
+    - name: 6. Valider la syntaxe des manifestes K8s
+      uses: stefanprodan/kube-tools@v1
+      with:
+        command: kubeconform k8s/
