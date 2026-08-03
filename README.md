@@ -1,10 +1,18 @@
 # 📝 Bloc-Notes Terminal (Pro)
 
-Une application web de prise de notes rapide, légère et moderne, construite avec **Node.js**, **Express** et **SQLite**, containerisée avec **Docker** et orchestrée sous **Kubernetes**.
+Une application web de prise de notes rapide, légère et moderne, construite avec **Node.js**, **Express** et **SQLite**, containerisée avec **Docker**, orchestrée sous **Kubernetes** et déployée automatiquement via une chaîne **CI/CD / GitOps**.
 
 ---
 
-##  Fonctionnalités & Ergonomie
+## 🚀 Architecture CI/CD & GitOps
+
+Ce projet intègre une pipeline DevOps complète et automatisée :
+[200~1. **Intégration Continue (CI) :** À chaque `push` sur la branche `main`, **GitHub Actions** compile le code, valide les configurations, build l'image Docker et la publie sur Docker Hub.
+2. **Déploiement Continu (CD / GitOps) :** **ArgoCD** surveille le dossier `k8s/` du dépôt. Dès qu'un changement est détecté dans la configuration, ArgoCD synchronise automatiquement l'état du cluster Kubernetes (Minikube) sans intervention manuelle (*Auto-Sync & Self-Healing*).
+
+---
+
+## ✨ Fonctionnalités & Ergonomie
 
 - **Gestion des documents :** Création, édition, recherche et suppression de notes en temps réel.
 - **Auto-sauvegarde :** Enregistrement automatique lors de la saisie sans besoin de cliquer sur "Enregistrer".
@@ -21,23 +29,26 @@ Une application web de prise de notes rapide, légère et moderne, construite av
 
 ---
 
-##  Technologies utilisées
+## 🛠️ Technologies utilisées
 
 - **Backend :** Node.js, Express.js
 - **Base de données :** SQLite (via `better-sqlite3`)
 - **Frontend :** HTML5, CSS3, JavaScript Vanilla (Fetch API)
 - **Containerisation & Orchestration :** Docker, Docker Hub, Kubernetes (Minikube)
-- **Versionning & Édition :** Git, GitHub, Nano
+- **CI/CD & GitOps :** GitHub Actions, ArgoCD
+- **Versionning :** Git, GitHub
 
 ---
 
-##  Installation et Lancement Local
+## 📦 Installation et Lancement Local
 
 ### Prérequis
 - [Node.js](https://nodejs.org/) (version 18 ou supérieure)
+- [Docker](https://www.docker.com/) & [Minikube](https://minikube.sigs.k8s.io/docs/)
 - Git
 
 ### 1. Cloner le dépôt
 ```bash
 git clone [https://github.com/eunicefelixtine/Bloc-notesTerminal.git](https://github.com/eunicefelixtine/Bloc-notesTerminal.git)
+
 cd Bloc-notesTerminal
