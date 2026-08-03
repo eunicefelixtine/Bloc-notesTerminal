@@ -4,7 +4,7 @@ Une application web de prise de notes rapide, légère et moderne, construite av
 
 ---
 
-## 🚀 Architecture CI/CD & GitOps
+##  Architecture CI/CD & GitOps
 
 Ce projet intègre une pipeline DevOps complète et automatisée :
 [200~1. **Intégration Continue (CI) :** À chaque `push` sur la branche `main`, **GitHub Actions** compile le code, valide les configurations, build l'image Docker et la publie sur Docker Hub.
@@ -12,7 +12,7 @@ Ce projet intègre une pipeline DevOps complète et automatisée :
 
 ---
 
-## ✨ Fonctionnalités & Ergonomie
+##  Fonctionnalités & Ergonomie
 
 - **Gestion des documents :** Création, édition, recherche et suppression de notes en temps réel.
 - **Auto-sauvegarde :** Enregistrement automatique lors de la saisie sans besoin de cliquer sur "Enregistrer".
@@ -29,7 +29,7 @@ Ce projet intègre une pipeline DevOps complète et automatisée :
 
 ---
 
-## 🛠️ Technologies utilisées
+##  Technologies utilisées
 
 - **Backend :** Node.js, Express.js
 - **Base de données :** SQLite (via `better-sqlite3`)
@@ -40,7 +40,7 @@ Ce projet intègre une pipeline DevOps complète et automatisée :
 
 ---
 
-## 📦 Installation et Lancement Local
+##  Installation et Lancement Local
 
 ### Prérequis
 - [Node.js](https://nodejs.org/) (version 18 ou supérieure)
